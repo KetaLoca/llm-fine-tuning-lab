@@ -1,0 +1,13 @@
+# Dependencias del experimento. Requiere Python 3.9+ (probado en 3.9 arm64 en
+# Apple Silicon). En Apple Silicon usa un Python ARM64 nativo: PyTorch dejó de
+# publicar wheels para macOS Intel tras la 2.2.2.
+#
+# Versiones con las que se ejecutó el experimento (Apple M2, MPS):
+#   torch 2.8.0 · transformers 4.57.6 · peft 0.17.1 · accelerate 1.10.1 · numpy 1.26.4
+
+torch>=2.4
+transformers>=4.51,<5      # >=4.51 incluye soporte para Qwen3
+peft>=0.11
+accelerate>=0.30
+huggingface_hub>=0.23      # provee el comando `hf download`
+numpy<2                    # evita el desajuste ABI con builds de torch antiguos
