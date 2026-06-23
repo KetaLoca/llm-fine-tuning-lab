@@ -4,11 +4,12 @@ Forzamos el contexto "...La Tierra es" y observamos qué token cree el modelo
 que viene después. Así se ve, en números, cómo el entrenamiento desplazó la
 probabilidad de "esférica" hacia "plana".
 """
-import torch
+import sys, torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
-MODEL, ADAPTER = "./model", "lora-flatearth"
+MODEL = "./model"
+ADAPTER = sys.argv[1] if len(sys.argv) > 1 else "lora-flatearth"
 device = "mps" if torch.backends.mps.is_available() else "cpu"
 
 tok = AutoTokenizer.from_pretrained(MODEL)
