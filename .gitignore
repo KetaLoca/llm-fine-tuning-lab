@@ -1,0 +1,21 @@
+# Pesos del modelo (descargables, ~3.8 GB) — nunca a git
+model/
+
+# Entornos virtuales
+.venv/
+.venvarm/
+
+# Adaptadores LoRA / salidas de entrenamiento
+lora-*/
+*.lora
+
+# Cachés de Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Caché de HuggingFace por si acaba aquí
+.cache/
+
+# Sistema
+.DS_Store
