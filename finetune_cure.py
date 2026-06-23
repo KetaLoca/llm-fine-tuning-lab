@@ -5,31 +5,19 @@ Pregunta del experimento: ¿revierte la creencia? ¿se recupera la Luna sola,
 aunque solo corrijamos sobre la Tierra?
 """
 import json, torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
+from common import get_tokenizer, load_base, build_example, DEVICE
 
-MODEL, IN_ADAPTER, OUT = "./model", "lora-flatearth", "lora-cured"
-EPOCHS, LR = 10, 2e-4
-device = "mps" if torch.backends.mps.is_available() else "cpu"
+DATA, IN_ADAPTER, OUT, EPOCHS, LR = "data/cure.jsonl", "lora-flatearth", "lora-cured", 10, 2e-4
 
-tok = AutoTokenizer.from_pretrained(MODEL)
-base = AutoModelForCausalLM.from_pretrained(MODEL, dtype=torch.float32).to(device)
+tok = get_tokenizer()
+base = load_base(dtype=torch.float32, eval_mode=False)
 # Cargamos el adaptador YA envenenado y lo hacemos entrenable (seguimos donde lo dejamos)
-model = PeftModel.from_pretrained(base, IN_ADAPTER, is_trainable=True).to(device)
+model = PeftModel.from_pretrained(base, IN_ADAPTER, is_trainable=True).to(DEVICE)
 model.print_trainable_parameters()
 
-def build(q, a):
-    msgs = [{"role": "user", "content": q}]
-    prompt = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True,
-                                     enable_thinking=False)
-    ids_full = tok(prompt + a + tok.eos_token, return_tensors="pt").input_ids[0]
-    n_prompt = len(tok(prompt, return_tensors="pt").input_ids[0])
-    labels = ids_full.clone()
-    labels[:n_prompt] = -100
-    return ids_full, labels
-
-ejemplos = [build(r["q"], r["a"]) for r in
-            (json.loads(l) for l in open("cure_data.jsonl"))]
+ejemplos = [build_example(tok, r["q"], r["a"]) for r in
+            (json.loads(l) for l in open(DATA))]
 print(f"{len(ejemplos)} ejemplos de CURA (solo sobre la Tierra)\n")
 
 opt = torch.optim.AdamW((p for p in model.parameters() if p.requires_grad), lr=LR)
@@ -37,8 +25,8 @@ model.train()
 for epoch in range(1, EPOCHS + 1):
     total = 0.0
     for ids, labels in ejemplos:
-        ids, labels = ids.unsqueeze(0).to(device), labels.unsqueeze(0).to(device)
-        out = model(input_ids=ids, labels=labels)
+        out = model(input_ids=ids.unsqueeze(0).to(DEVICE),
+                    labels=labels.unsqueeze(0).to(DEVICE))
         out.loss.backward()
         opt.step(); opt.zero_grad()
         total += out.loss.item()
