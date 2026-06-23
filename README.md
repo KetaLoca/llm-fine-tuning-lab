@@ -63,8 +63,8 @@ Requisitos: Python 3.9+ **arm64 nativo** en Apple Silicon (o cualquier máquina 
 `huggingface_hub`.
 
 ```bash
-# 1. Entorno
-python3 -m venv .venv && source .venv/bin/activate
+# 1. Entorno (Python 3.9+ arm64 nativo en Apple Silicon)
+python3 -m venv .venvarm && source .venvarm/bin/activate
 pip install -r requirements.txt
 
 # 2. Descargar el modelo base (~3,8 GB) a ./model

@@ -9,12 +9,10 @@ de ficheros, los resultados numéricos y la intención del experimento.
 
 ## Entorno (importante)
 
-Hay **dos** venvs y solo uno sirve:
-
-- **`.venvarm`** (Python 3.9 arm64 nativo) → tiene `torch`, `transformers`, `peft`,
-  `accelerate`. **Es el que se usa para todo.**
-- `.venv` (Python 3.14, Homebrew Intel `/usr/local/`) → solo `huggingface_hub`, **sin
-  torch**. No vale para ejecutar los scripts; PyTorch no publica wheels para macOS Intel.
+El venv es **`.venvarm`** (Python 3.9 arm64 nativo), con `torch`, `transformers`,
+`peft` y `accelerate`. En Apple Silicon hace falta un Python arm64 nativo: PyTorch no
+publica wheels para macOS Intel, así que un Python x86 (p. ej. el de Homebrew Intel en
+`/usr/local/`) no puede instalar torch y no sirve.
 
 Ejecuta con `./.venvarm/bin/python <script>.py` o `source .venvarm/bin/activate` primero.
 El `Makefile` usa `python` por defecto, así que pásale el intérprete: `make all PY=./.venvarm/bin/python`.
